@@ -1,0 +1,95 @@
+name: release build
+
+on:
+  push:
+        tags:
+          - 'v*'
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: get version
+        run: |
+          $version = "${{ github.ref }}" -replace "refs/tags/v", ""
+          echo "CURRENT_VER=v$version" >>  $env:GITHUB_ENV 
+          echo "CURRENT_VER_NUM=$version" >>  $env:GITHUB_ENV 
+        shell: pwsh   
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name:  Download RemoteFingerUnlock arm64
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/RemoteFingerUnlockModule'
+          version: "tags/${{ env.CURRENT_VER }}"
+          file: "RemoteFingerUnlockModule_ARM64.zip"
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download RemoteFingerUnlock x86
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/RemoteFingerUnlockModule'
+          version:  "tags/${{ env.CURRENT_VER }}"
+          file: "RemoteFingerUnlockModule_Win32.zip"
+          token: ${{ secrets.GH_TOKEN }} 
+      - name:  Download RemoteFingerUnlock x64
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/RemoteFingerUnlockModule'
+          version: "tags/${{ env.CURRENT_VER }}"
+          file: "RemoteFingerUnlockModule_x64.zip"
+          token: ${{ secrets.GH_TOKEN }}     
+
+      - name:  Download core-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version:  "tags/${{ env.CURRENT_VER }}"
+          file: "core-service-x86.exe"
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download core-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version:  "tags/${{ env.CURRENT_VER }}"
+          file: "core-service-x64.exe"
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download core-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version: "tags/${{ env.CURRENT_VER }}"
+          file: "core-service-arm64.exe"
+          token: ${{ secrets.GH_TOKEN }}                    
+      - name: unzip
+        run: |
+           Get-ChildItem -Path . -Filter *.zip | ForEach-Object {
+            $zipFileName = $_.BaseName
+            $destinationPath = Join-Path -Path (Get-Location) -ChildPath $zipFileName
+            Expand-Archive -Path $_.FullName -DestinationPath $destinationPath }
+        shell: pwsh
+      - run : ls
+      - name: Compile x64 Installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: setup_x64.iss
+          options: /O+  /DAppVersion=${{ env.CURRENT_VER_NUM }} /DVersionInfoVersion=${{ env.CURRENT_VER_NUM }}
+      - name: Compile x86
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: setup_x86.iss
+          options: /O+  /DAppVersion=${{ env.CURRENT_VER_NUM }} /DVersionInfoVersion=${{ env.CURRENT_VER_NUM }}
+      - name: Compile arm64
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: setup_arm64.iss
+          options: /O+  /DAppVersion=${{ env.CURRENT_VER_NUM }} /DVersionInfoVersion=${{ env.CURRENT_VER_NUM }}        
+
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "Output/*.exe"
+          prerelease: false
+          tag_name:  ${{ env.CURRENT_VER }}
+          token: ${{ secrets.GH_TOKEN }}
+          body_path: release_note.md

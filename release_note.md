@@ -1,0 +1,1 @@
+This version does not support the old app. Please do not download!

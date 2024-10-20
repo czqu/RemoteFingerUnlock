@@ -35,7 +35,7 @@ Source: "start_slave.bat"; DestDir: "{app}"               ;Flags:              u
 Source: "stop_slave.bat"; DestDir: "{app}"                 ;Flags:              uninsrestartdelete
 
 Source: "core-service-x86.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"              ;Flags:              uninsrestartdelete
-
+Source: "install-service-x86.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"                ;Flags:              uninsrestartdelete
 Source: "RemoteFingerUnlockModule_Win32\RemoteFingerUnlockModule.dll"; DestDir: "{app}"                ;Flags:       uninsrestartdelete
 
 
@@ -71,7 +71,7 @@ Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: 
 [Run]
 Filename: "cmd.exe"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""远程解锁控制面板"" /f"; Flags: runhidden  nowait                                                          
 
-Filename: "{app}\core-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";       StatusMsg: "Creating services..."
+Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."       
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow protocol=TCP "; Flags: runhidden       
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow protocol=UDP "; Flags: runhidden                 
@@ -83,7 +83,7 @@ Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM rfu_desktop.exe"; WorkingDir
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Allow Port Fada Control Service TCP Inbound"""; Flags: runhidden          
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Allow Port Fada Control Service UDP Inbound"""; Flags: runhidden           
 Filename: "{sys}\sc.exe"; Parameters: "stop FadaControlService";Flags: runhidden   waituntilterminated       ;    StatusMsg: "Stopping  services..."   
-Filename: "{app}\core-service.exe";     Parameters: "-u"     ;WorkingDir: "{app}"             ;Flags: runhidden   waituntilterminated      ;    StatusMsg: "Deleting  services..."
+Filename: "{app}\install-service.exe";     Parameters: "-u"     ;WorkingDir: "{app}"             ;Flags: runhidden   waituntilterminated      ;    StatusMsg: "Deleting  services..."
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM core-service.exe"; WorkingDir: "{app}"; Flags: runhidden waituntilterminated;  StatusMsg: "Stopping services..."     
 
  

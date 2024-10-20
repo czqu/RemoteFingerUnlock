@@ -1,1 +1,1 @@
-This version does not support the old app. Please do not download!
+For more information, please visit https://rfu.czqu.net.

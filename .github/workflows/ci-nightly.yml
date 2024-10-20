@@ -2,6 +2,7 @@ name: nightly build
 
 on:
   push:
+    branches: main
   schedule:
       - cron: '0 0 * * *'  
  
@@ -12,7 +13,13 @@ jobs:
      
       - name: Checkout
         uses: actions/checkout@v4
-
+      - name:  Download Rfu-desktop Windows
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+            repo: 'czqu/rfu-desktop'
+            version: 'tags/nightly'
+            file: "rfu_desktop_windows_x64.zip"
+            token: ${{ secrets.GH_TOKEN }}
       - name:  Download RemoteFingerUnlock arm64
         uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -55,7 +62,28 @@ jobs:
           repo: 'czqu/fadacontrol'
           version: 'tags/nightly'
           file: "core-service-arm64.exe"
-          token: ${{ secrets.GH_TOKEN }}                    
+          token: ${{ secrets.GH_TOKEN }}             
+      - name:  Download install-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+            repo: 'czqu/fadacontrol'
+            version: 'tags/nightly'
+            file: "install-service-x64.exe"
+            token: ${{ secrets.GH_TOKEN }}        
+      - name:  Download install-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+            repo: 'czqu/fadacontrol'
+            version: 'tags/nightly'
+            file: "install-service-arm64.exe"
+            token: ${{ secrets.GH_TOKEN }}     
+      - name:  Download install-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+            repo: 'czqu/fadacontrol'
+            version: 'tags/nightly'
+            file: "install-service-x86.exe"
+            token: ${{ secrets.GH_TOKEN }}         
       - name: unzip
         run: |
            Get-ChildItem -Path . -Filter *.zip | ForEach-Object {

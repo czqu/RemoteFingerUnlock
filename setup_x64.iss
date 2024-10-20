@@ -36,19 +36,25 @@ Source: "start_slave.bat"; DestDir: "{app}"        ;Check: InstallX64           
 Source: "stop_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
 
 Source: "core-service-x64.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
-
+Source: "install-service-x64.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "RemoteFingerUnlockModule_x64\RemoteFingerUnlockModule.dll"; DestDir: "{app}"   ;Check: InstallX64              ;Flags:       uninsrestartdelete
 
-
+Source: "rfu_desktop_windows_x64\rfu_desktop.exe "; DestDir: "{app}"        ;Check: InstallX64          ;Flags:              uninsrestartdelete       
+Source: "rfu_desktop_windows_x64\*.dll"; DestDir: "{app}"        ;Check: InstallX64               ;        Flags:              uninsrestartdelete         ;
+Source: "rfu_desktop_windows_x64\data\*"; DestDir: "{app}\data"        ;Check: InstallX64      ;    Flags: recursesubdirs 
 
 
 [Icons]                                                                                                                                 
 Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"; Filename: "{uninstallexe}"; WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{commondesktop}\rfu-control-panel"; Filename: "{app}\rfu_desktop.exe";    WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{group}\RemoteFingerUnlockModule\rfu-control-panel"; Filename: "{app}\rfu_desktop.exe"; WorkingDir: "{app}"; Check: InstallX64
+
 
 
 
 [UninstallDelete]
 Type: files; Name: "{app}\RemoteFingerUnlockModule.dll"             ;Check: InstallX64
+Type: files; Name: "{app}\rfu_desktop.exe"      ;Check: InstallX64
 Type: files; Name: "{app}\core-service.exe"     ;Check: InstallX64
 Type: files; Name: "{app}\*.dll"                                ;Check: InstallX64
 Type: files; Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"        ;Check: InstallX64
@@ -72,11 +78,11 @@ Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: 
 [Run]
 Filename: "cmd.exe"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""远程解锁控制面板"" /f"; Flags: runhidden  nowait                                                         ;Check: InstallX64
 
-Filename: "{app}\core-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
+Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."      ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow protocol=TCP "; Flags: runhidden       ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow protocol=UDP "; Flags: runhidden      ;Check: InstallX64             
- 
+Filename: "{app}\rfu_desktop.exe";          WorkingDir: "{app}"             ;Flags:     nowait runasoriginaluser  ;Check: InstallX64        ; Description: "Run when finished";  
 Filename: "{app}\core-service.exe"; Flags:  runhidden nowait runasoriginaluser;  Parameters: "--slave -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Runing services..."
 
 
@@ -85,7 +91,7 @@ Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM rfu_desktop.exe"; WorkingDir
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Allow Port Fada Control Service TCP Inbound"""; Flags: runhidden         ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Allow Port Fada Control Service UDP Inbound"""; Flags: runhidden          ;Check: InstallX64
 Filename: "{sys}\sc.exe"; Parameters: "stop FadaControlService";Flags: runhidden   waituntilterminated     ;Check: InstallX64   ;    StatusMsg: "Stopping  services..."   
-Filename: "{app}\core-service.exe";     Parameters: "-u"     ;WorkingDir: "{app}"             ;Flags: runhidden   waituntilterminated     ;Check: InstallX64 ;    StatusMsg: "Deleting  services..."
+Filename: "{app}\install-service.exe";     Parameters: "-u"     ;WorkingDir: "{app}"             ;Flags: runhidden   waituntilterminated     ;Check: InstallX64 ;    StatusMsg: "Deleting  services..."
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM core-service.exe"; WorkingDir: "{app}"; Flags: runhidden waituntilterminated;  StatusMsg: "Stopping services..."    ;Check: InstallX64
 
  

@@ -46,8 +46,8 @@ Source: "rfu_desktop_windows_x64\data\*"; DestDir: "{app}\data"        ;Check: I
 
 [Icons]                                                                                                                                 
 Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"; Filename: "{uninstallexe}"; WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{commondesktop}\rfu-control-panel"; Filename: "{app}\rfu_desktop.exe";    WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{group}\RemoteFingerUnlockModule\rfu-control-panel"; Filename: "{app}\rfu_desktop.exe"; WorkingDir: "{app}"; Check: InstallX64
+Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe";    WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; WorkingDir: "{app}"; Check: InstallX64
 
 
 
@@ -61,6 +61,8 @@ Type: files; Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnloc
 Type: files; Name: "{group}\Uninstall RemoteFingerUnlockModule"                       ;Check: InstallX64
 Type: files; Name: "{commondesktop}\Uninstall RemoteFingerUnlockModule"            ;Check: InstallX64
 
+Type: files; Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Check: InstallX64
+Type: files; Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool";  Check: InstallX64
 
 [Registry]
 

@@ -1,11 +1,12 @@
-name: nightly build
+name: build for canary
 
 on:
   push:
     branches: main
   schedule:
       - cron: '0 0 * * *'  
- 
+  repository_dispatch:  
+    types: [canary]
 jobs:
   build:
     runs-on: windows-latest
@@ -17,28 +18,28 @@ jobs:
         uses: dsaltares/fetch-gh-release-asset@master
         with:
             repo: 'czqu/rfu-desktop'
-            version: 'tags/nightly'
+            version: 'tags/canary'
             file: "rfu_desktop_windows_x64.zip"
             token: ${{ secrets.GH_TOKEN }}
       - name:  Download RemoteFingerUnlock arm64
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/RemoteFingerUnlockModule'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "RemoteFingerUnlockModule_ARM64.zip"
           token: ${{ secrets.GH_TOKEN }}
       - name:  Download RemoteFingerUnlock x86
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/RemoteFingerUnlockModule'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "RemoteFingerUnlockModule_Win32.zip"
           token: ${{ secrets.GH_TOKEN }} 
       - name:  Download RemoteFingerUnlock x64
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/RemoteFingerUnlockModule'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "RemoteFingerUnlockModule_x64.zip"
           token: ${{ secrets.GH_TOKEN }}     
 
@@ -46,42 +47,42 @@ jobs:
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/fadacontrol'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "core-service-x86.exe"
           token: ${{ secrets.GH_TOKEN }}
       - name:  Download core-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/fadacontrol'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "core-service-x64.exe"
           token: ${{ secrets.GH_TOKEN }}
       - name:  Download core-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'czqu/fadacontrol'
-          version: 'tags/nightly'
+          version: 'tags/canary'
           file: "core-service-arm64.exe"
           token: ${{ secrets.GH_TOKEN }}             
       - name:  Download install-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:
             repo: 'czqu/fadacontrol'
-            version: 'tags/nightly'
+            version: 'tags/canary'
             file: "install-service-x64.exe"
             token: ${{ secrets.GH_TOKEN }}        
       - name:  Download install-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:
             repo: 'czqu/fadacontrol'
-            version: 'tags/nightly'
+            version: 'tags/canary'
             file: "install-service-arm64.exe"
             token: ${{ secrets.GH_TOKEN }}     
       - name:  Download install-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:
             repo: 'czqu/fadacontrol'
-            version: 'tags/nightly'
+            version: 'tags/canary'
             file: "install-service-x86.exe"
             token: ${{ secrets.GH_TOKEN }}         
       - name: unzip
@@ -114,6 +115,6 @@ jobs:
         with:
           files: "Output/*.exe"
           prerelease: true
-          tag_name:  nightly
+          tag_name:  canary
           token: ${{ secrets.GH_TOKEN }}
           body_path: release_note.md

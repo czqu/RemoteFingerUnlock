@@ -1,4 +1,4 @@
-﻿[Setup]
+[Setup]
 AppName=RemoteFingerUnlock
 AppVersion={#AppVersion}
 VersionInfoVersion={#VersionInfoVersion}
@@ -46,8 +46,8 @@ Source: "rfu_desktop_windows_x64\data\*"; DestDir: "{app}\data"        ;Check: I
 
 [Icons]                                                                                                                                 
 Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"; Filename: "{uninstallexe}"; WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe";    WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; WorkingDir: "{app}"; Check: InstallX64
+Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {localappdata}\rfu";   WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {localappdata}\rfu"; WorkingDir: "{app}"; Check: InstallX64
 
 
 
@@ -78,13 +78,12 @@ Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}\InprocServer3
 Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: string; ValueData: "RemoteFingerUnlockModule"; Flags: uninsdeletevalue                     uninsdeletekeyifempty                        ;Check: InstallX64
 
 [Run]
-Filename: "cmd.exe"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""远程解锁控制面板"" /f"; Flags: runhidden  nowait                                                         ;Check: InstallX64
 
 Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."      ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow protocol=TCP "; Flags: runhidden       ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow protocol=UDP "; Flags: runhidden      ;Check: InstallX64             
-Filename: "{app}\rfu_desktop.exe";          WorkingDir: "{app}"             ;Flags:     nowait runasoriginaluser  ;Check: InstallX64        ; Description: "Run when finished";  
+Filename: "{app}\rfu_desktop.exe";          WorkingDir: "{app}"  ;  Parameters: "-w {localappdata}\rfu";          Flags:     nowait runasoriginaluser  ;Check: InstallX64        ; Description: "Run when finished";  
 Filename: "{app}\core-service.exe"; Flags:  runhidden nowait runasoriginaluser;  Parameters: "--slave -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Runing services..."
 
 

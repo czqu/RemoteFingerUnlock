@@ -1,4 +1,4 @@
-[Setup]
+﻿[Setup]
 AppName=RemoteFingerUnlock
 AppVersion={#AppVersion}
 VersionInfoVersion={#VersionInfoVersion}
@@ -34,6 +34,7 @@ Source: "start_master.bat"; DestDir: "{app}"         ;Check: InstallX64         
 Source: "stop_master.bat"; DestDir: "{app}"      ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "start_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "stop_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "reset_config.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
 
 Source: "core-service-x64.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "install-service-x64.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete

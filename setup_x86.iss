@@ -33,6 +33,7 @@ Source: "start_master.bat"; DestDir: "{app}"                      ;Flags:       
 Source: "stop_master.bat"; DestDir: "{app}"                ;Flags:              uninsrestartdelete
 Source: "start_slave.bat"; DestDir: "{app}"               ;Flags:              uninsrestartdelete
 Source: "stop_slave.bat"; DestDir: "{app}"                 ;Flags:              uninsrestartdelete
+Source: "reset_config.bat"; DestDir: "{app}"               ;Flags:              uninsrestartdelete
 
 Source: "core-service-x86.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"              ;Flags:              uninsrestartdelete
 Source: "install-service-x86.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"                ;Flags:              uninsrestartdelete

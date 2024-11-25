@@ -33,11 +33,11 @@ OutputBaseFilename=setup_x64
 Source: "start_master.bat"; DestDir: "{app}"         ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "stop_master.bat"; DestDir: "{app}"      ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "start_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
-Source: "stop_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "reset_config.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
 
 Source: "core-service-x64.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "install-service-x64.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "rfuct-x64.exe"; DestDir: "{app}"  ; DestName: "rfuct.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
 Source: "RemoteFingerUnlockModule_x64\RemoteFingerUnlockModule.dll"; DestDir: "{app}"   ;Check: InstallX64              ;Flags:       uninsrestartdelete
 
 Source: "rfu_desktop_windows_x64\rfu_desktop.exe "; DestDir: "{app}"        ;Check: InstallX64          ;Flags:              uninsrestartdelete       

@@ -65,7 +65,28 @@ jobs:
           repo: 'czqu/fadacontrol'
           version: 'tags/canary'
           file: "core-service-arm64.exe"
-          token: ${{ secrets.GH_TOKEN }}             
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download rfuct
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version: 'tags/canary'
+          file: "rfuct-x86.exe"
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download rfuct
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version: 'tags/canary'
+          file: "rfuct-x64.exe"
+          token: ${{ secrets.GH_TOKEN }}
+      - name:  Download rfuct
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          version: 'tags/canary'
+          file: "rfuct-arm64.exe"
+          token: ${{ secrets.GH_TOKEN }}
       - name:  Download install-service
         uses: dsaltares/fetch-gh-release-asset@master
         with:

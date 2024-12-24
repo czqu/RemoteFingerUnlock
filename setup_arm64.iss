@@ -77,8 +77,7 @@ Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  P
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=TCP"; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=UDP"; Flags: runhidden
-
-Filename: "{app}\core-service.exe"; Flags:  runhidden nowait runasoriginaluser;  Parameters: "--slave -w {localappdata}\rfu"    ;  WorkingDir: "{app}";        StatusMsg: "Runing services..."
+Filename: "{app}\core-service.exe"; Flags:  runhidden nowait runasoriginaluser;  Parameters: "--slave -w {localappdata}\rfu"    ;  WorkingDir: "{app}";      StatusMsg: "Runing services..."
 
 
 [UninstallRun]
@@ -127,24 +126,64 @@ function IsCheck: Boolean;
 begin
   Result := True;
 end;
-function InitializeSetup(): boolean;
+function InitializeSetup(): Boolean;
 var
+  WindowsVersion: Cardinal;
+  MajorVersion, MinorVersion, BuildNumber: Cardinal;
   ResultStr: String;
   ResultCode: Integer;
 begin
+  // Retrieve Windows version
+  WindowsVersion := GetWindowsVersion;
+  MajorVersion := WindowsVersion shr 24;
+  MinorVersion := (WindowsVersion shr 16) and $FF;
+  BuildNumber := WindowsVersion and $FFFF;
+
+  // Check if the OS is Windows 10 or later
+  if (MajorVersion < 10) then
+  begin
+    MsgBox('This application only supports Windows 10 or higher.', mbError, MB_OK);
+    Result := False; // Abort installation
+    Exit; // Exit the function
+  end;
+
+  // Check if an older version is installed
   if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9C599831-99CF-4185-98C8-E4258849AF0F}_is1', 'UninstallString', ResultStr) then
   begin
     ResultStr := RemoveQuotes(ResultStr);
 
-
     if MsgBox('A previous version of the software is detected. Do you want to uninstall it before proceeding?', mbConfirmation, MB_YESNO) = IDYES then
     begin
-
-      Exec(ResultStr, '/silent', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      // Silent uninstall of the old version
+      if Exec(ResultStr, '/silent', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+      begin
+        if ResultCode = 0 then
+        begin
+          MsgBox('The previous version has been successfully uninstalled.', mbInformation, MB_OK);
+        end
+        else
+        begin
+          MsgBox('An error occurred while uninstalling the previous version. Please uninstall it manually and try again.', mbError, MB_OK);
+          Result := False; // Abort installation
+          Exit; // Exit the function
+        end;
+      end
+      else
+      begin
+        MsgBox('Unable to start the uninstallation program. Please uninstall manually and try again.', mbError, MB_OK);
+        Result := False; // Abort installation
+        Exit; // Exit the function
+      end;
+    end
+    else
+    begin
+      MsgBox('Installation canceled because the old version was not uninstalled.', mbError, MB_OK);
+      Result := False; // Abort installation
+      Exit; // Exit the function
     end;
   end;
 
-  Result := True;
+  Result := True; // Continue with installation
 end;
 
 function GetModuleHandle(lpModuleName: LongInt): LongInt;

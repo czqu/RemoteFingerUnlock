@@ -76,7 +76,7 @@ Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  P
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=TCP"; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=UDP"; Flags: runhidden
-Filename: "{app}\core-service.exe"; Flags:  runhidden nowait runasoriginaluser;  Parameters: "--slave -w {localappdata}\rfu"    ;  WorkingDir: "{app}";      StatusMsg: "Runing services..."
+
 
 
 [UninstallRun]

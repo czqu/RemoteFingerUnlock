@@ -47,8 +47,8 @@ Source: "rfu_desktop_windows_x64\data\*"; DestDir: "{app}\data"        ;Check: I
 
 [Icons]
 Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"; Filename: "{uninstallexe}"; WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {localappdata}\rfu";   WorkingDir: "{app}"          ;Check: InstallX64
-Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {localappdata}\rfu"; WorkingDir: "{app}"; Check: InstallX64
+Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {sd}\rfu";   WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {sd}\rfu"; WorkingDir: "{app}"; Check: InstallX64
 
 
 
@@ -67,9 +67,8 @@ Type: files; Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configur
 
 [Registry]
 
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "RemoteFingerUnlockCoreService"; ValueData: """{app}\start_slave.bat""  --slave -w {localappdata}\rfu"; Flags: uninsdeletevalue        ;Check: InstallX64
 
-Root: HKLM; Subkey: "SOFTWARE\RemoteFingerUnlock"; ValueType: string; ValueName: "log_path"; ValueData: "{localappdata}\rfu\log\RemoteFingerUnlockModule.log"      ; Flags: uninsdeletevalue     uninsdeletekeyifempty       ;Check: InstallX64
+Root: HKLM; Subkey: "SOFTWARE\RemoteFingerUnlock"; ValueType: string; ValueName: "log_path"; ValueData: "{sd}\rfu\log\RemoteFingerUnlockModule.log"      ; Flags: uninsdeletevalue     uninsdeletekeyifempty       ;Check: InstallX64
 Root: HKLM; Subkey: "SOFTWARE\RemoteFingerUnlock"; ValueType: dword; ValueName: "log_level"; ValueData: 2                  ;   Flags: uninsdeletevalue            uninsdeletekeyifempty     ;Check: InstallX64
 
 
@@ -79,12 +78,13 @@ Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}\InprocServer3
 Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: string; ValueData: "RemoteFingerUnlockModule"; Flags: uninsdeletevalue                     uninsdeletekeyifempty                        ;Check: InstallX64
 
 [Run]
-
-Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {localappdata}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
+Filename: "cmd.exe"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""远程解锁控制面板"" /f"; Flags: runhidden  nowait
+Filename: "cmd.exe"; Parameters: "/C xcopy ""{localappdata}\rfu"" ""{sd}\rfu""  /E /I /Y"; Flags: runhidden  skipifdoesntexist waituntilterminated
+Filename: "{app}\install-service.exe"; Flags:  runhidden waituntilterminated;  Parameters: "-i -w {sd}\rfu"    ;  WorkingDir: "{app}";    Check: InstallX64       ;    StatusMsg: "Creating services..."
 Filename: "{sys}\sc.exe"; Parameters: "start FadaControlService"; Flags: runhidden  waituntilterminated  ;  StatusMsg: "Starting services..."      ;Check: InstallX64
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service TCP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=TCP"; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Allow Port Fada Control Service UDP Inbound"" dir=in action=allow program=""{app}\core-service.exe"" protocol=UDP"; Flags: runhidden
-Filename: "{app}\rfu_desktop.exe";          WorkingDir: "{app}"  ;  Parameters: "-w {localappdata}\rfu";          Flags:     nowait   ;Check: InstallX64        ; Description: "Run when finished";
+Filename: "{app}\rfu_desktop.exe";          WorkingDir: "{app}"  ;  Parameters: "-w {sd}\rfu";          Flags:     nowait   ;Check: InstallX64        ; Description: "Run when finished";
 
 
 
@@ -94,8 +94,7 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Allow Port Fada Control Service UDP Inbound"""; Flags: runhidden          ;Check: InstallX64
 Filename: "{sys}\sc.exe"; Parameters: "stop FadaControlService";Flags: runhidden   waituntilterminated     ;Check: InstallX64   ;    StatusMsg: "Stopping  services..."
 Filename: "{app}\install-service.exe";     Parameters: "-u"     ;WorkingDir: "{app}"             ;Flags: runhidden   waituntilterminated     ;Check: InstallX64 ;    StatusMsg: "Deleting  services..."
-Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM core-service.exe"; WorkingDir: "{app}"; Flags: runhidden waituntilterminated;  StatusMsg: "Stopping services..."    ;Check: InstallX64
-
+Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM core-service.exe"; WorkingDir: "{app}"; Flags: runhidden waituntilterminated;  StatusMsg: "Stopping services..."
 
 
 
@@ -229,7 +228,7 @@ var
 begin
   if DeleteConfig then
   begin
-    ConfigPath := ExpandConstant('{localappdata}\rfu');
+    ConfigPath := ExpandConstant('{sd}\rfu');
     if DirExists(ConfigPath) then
     begin
       DelTree(ConfigPath, True, True, True);

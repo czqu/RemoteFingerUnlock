@@ -3,7 +3,7 @@ name: build for canary
 on:
   push:
     branches:
-      - canary
+      - release/canary
   schedule:
       - cron: '0 0 * * *'
   repository_dispatch:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: canary
+          ref: release/canary
       - name:  Download Rfu-desktop Windows
         uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -133,7 +133,11 @@ jobs:
           path: setup_arm64.iss
           options: /O+  /DAppVersion=3.5.1.9 /DVersionInfoVersion=3.5.1.9
 
-
+      - name: Compile manual config x64
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: setup_manual_config_x64.iss
+          options: /O+  /DAppVersion=3.5.1.9 /DVersionInfoVersion=3.5.1.9
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:

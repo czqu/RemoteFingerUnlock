@@ -1,0 +1,228 @@
+﻿[Setup]
+AppName=RemoteFingerUnlock
+AppVersion={#AppVersion}
+VersionInfoVersion={#VersionInfoVersion}
+AppPublisher=czqu
+AppPublisherURL=http://rfu.czqu.net
+AppSupportURL=http://rfu.czqu.net
+AppUpdatesURL=http://rfu.czqu.net
+VersionInfoCopyright=Copyright (C) 2020-2024 Paul Chen.
+AppMutex=RemoteFingerUnlockCompilerAppMutex,Global\RemoteFingerUnlockCompilerAppMutex
+SetupMutex=RemoteFingerUnlockCompilerSetupMutex,Global\RemoteFingerUnlockCompilerSetupMutex
+WizardStyle=modern
+Compression=lzma2/max
+SolidCompression=yes
+DefaultDirName={pf}\RemoteFingerUnlockModule
+DefaultGroupName=RemoteFingerUnlock
+TimeStampsInUTC=yes
+DisableProgramGroupPage=yes
+OutputDir=Output
+LicenseFile="License.rtf"
+AppId={{9C599831-99CF-4185-98C8-E4258849AF0F}
+DisableWelcomePage=no
+DisableFinishedPage=no
+
+ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=x64
+OutputBaseFilename=setup_manual_config_x64
+
+
+[Files]
+
+
+Source: "start_master.bat"; DestDir: "{app}"         ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "stop_master.bat"; DestDir: "{app}"      ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "start_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "stop_slave.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "reset_config.bat"; DestDir: "{app}"        ;Check: InstallX64            ;Flags:              uninsrestartdelete
+
+Source: "core-service-x64.exe"; DestDir: "{app}"  ; DestName: "core-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "install-service-x64.exe"; DestDir: "{app}"  ; DestName: "install-service.exe"     ;Check: InstallX64            ;Flags:              uninsrestartdelete
+Source: "RemoteFingerUnlockModule_x64\RemoteFingerUnlockModule.dll"; DestDir: "{app}"   ;Check: InstallX64              ;Flags:       uninsrestartdelete
+
+Source: "rfu_desktop_windows_x64\rfu_desktop.exe "; DestDir: "{app}"        ;Check: InstallX64          ;Flags:              uninsrestartdelete
+Source: "rfu_desktop_windows_x64\*.dll"; DestDir: "{app}"        ;Check: InstallX64               ;        Flags:              uninsrestartdelete         ;
+Source: "rfu_desktop_windows_x64\data\*"; DestDir: "{app}\data"        ;Check: InstallX64      ;    Flags: recursesubdirs
+
+
+[Icons]
+Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"; Filename: "{uninstallexe}"; WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {sd}\rfu";   WorkingDir: "{app}"          ;Check: InstallX64
+Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool"; Filename: "{app}\rfu_desktop.exe"; Parameters: "-w {sd}\rfu"; WorkingDir: "{app}"; Check: InstallX64
+
+
+
+
+[UninstallDelete]
+Type: files; Name: "{app}\RemoteFingerUnlockModule.dll"             ;Check: InstallX64
+Type: files; Name: "{app}\rfu_desktop.exe"      ;Check: InstallX64
+Type: files; Name: "{app}\core-service.exe"     ;Check: InstallX64
+Type: files; Name: "{app}\*.dll"                                ;Check: InstallX64
+Type: files; Name: "{group}\RemoteFingerUnlockModule\Uninstall RemoteFingerUnlockModule"        ;Check: InstallX64
+Type: files; Name: "{group}\Uninstall RemoteFingerUnlockModule"                       ;Check: InstallX64
+Type: files; Name: "{commondesktop}\Uninstall RemoteFingerUnlockModule"            ;Check: InstallX64
+
+Type: files; Name: "{commondesktop}\RemoteFingerUnlock Configuration Tool"; Check: InstallX64
+Type: files; Name: "{group}\RemoteFingerUnlockModule\RemoteFingerUnlock Configuration Tool";  Check: InstallX64
+
+[Registry]
+
+
+Root: HKLM; Subkey: "SOFTWARE\RemoteFingerUnlock"; ValueType: string; ValueName: "log_path"; ValueData: "{sd}\rfu\log\RemoteFingerUnlockModule.log"      ; Flags: uninsdeletevalue     uninsdeletekeyifempty       ;Check: InstallX64
+Root: HKLM; Subkey: "SOFTWARE\RemoteFingerUnlock"; ValueType: dword; ValueName: "log_level"; ValueData: 2                  ;   Flags: uninsdeletevalue            uninsdeletekeyifempty     ;Check: InstallX64
+
+
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: string; ValueData: "RemoteFingerUnlockModule"; Flags: uninsdeletevalue        ;Check: InstallX64
+Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}\InprocServer32"; ValueType: string; ValueData: "{app}\RemoteFingerUnlockModule.dll"; Flags: uninsdeletevalue     uninsdeletekeyifempty                        ;Check: InstallX64
+Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}\InprocServer32";  ValueType: string; ValueName: "ThreadingModel" ; ValueData:"Apartment"   ; Flags: uninsdeletevalue      uninsdeletekeyifempty            ;Check: InstallX64
+Root: HKCR; Subkey: "CLSID\{{69168A1C-D241-49DA-8077-171E0D35C74F}"; ValueType: string; ValueData: "RemoteFingerUnlockModule"; Flags: uninsdeletevalue                     uninsdeletekeyifempty                        ;Check: InstallX64
+
+
+
+
+
+
+
+
+
+[Tasks]
+Name: desktopicon; Description: "{cm:CreateDesktopIcon}"; Check: IsCheck
+Name: visitwebsite; Description: Visit our website; Check: IsCheck
+
+
+
+[Messages]
+WelcomeLabel1=Welcome to the RemoteFingerUnlockModule Setup%nSetup Wizard
+
+
+
+
+[Code]
+
+function InstallX64: Boolean;
+begin
+  Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
+end;
+
+
+function InstallARM64: Boolean;
+begin
+  Result := Is64BitInstallMode and (ProcessorArchitecture = paARM64);
+end;
+
+function InstallX86: Boolean;
+begin
+  Result := IsX86 and (ProcessorArchitecture = paX86);
+end;
+function IsCheck: Boolean;
+begin
+  Result := True;
+end;
+function InitializeSetup(): Boolean;
+var
+  WindowsVersion: Cardinal;
+  MajorVersion, MinorVersion, BuildNumber: Cardinal;
+  ResultStr: String;
+  ResultCode: Integer;
+begin
+  // Retrieve Windows version
+  WindowsVersion := GetWindowsVersion;
+  MajorVersion := WindowsVersion shr 24;
+  MinorVersion := (WindowsVersion shr 16) and $FF;
+  BuildNumber := WindowsVersion and $FFFF;
+
+  // Check if the OS is Windows 10 or later
+  if (MajorVersion < 10) then
+  begin
+    MsgBox('This application only supports Windows 10 or higher.', mbError, MB_OK);
+    Result := False; // Abort installation
+    Exit; // Exit the function
+  end;
+
+  // Check if an older version is installed
+  if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9C599831-99CF-4185-98C8-E4258849AF0F}_is1', 'UninstallString', ResultStr) then
+  begin
+    ResultStr := RemoveQuotes(ResultStr);
+
+    if MsgBox('A previous version of the software is detected. Do you want to uninstall it before proceeding?', mbConfirmation, MB_YESNO) = IDYES then
+    begin
+      // Silent uninstall of the old version
+      if Exec(ResultStr, '/silent', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+      begin
+        if ResultCode = 0 then
+        begin
+          MsgBox('The previous version has been successfully uninstalled.', mbInformation, MB_OK);
+        end
+        else
+        begin
+          MsgBox('An error occurred while uninstalling the previous version. Please uninstall it manually and try again.', mbError, MB_OK);
+          Result := False; // Abort installation
+          Exit; // Exit the function
+        end;
+      end
+      else
+      begin
+        MsgBox('Unable to start the uninstallation program. Please uninstall manually and try again.', mbError, MB_OK);
+        Result := False; // Abort installation
+        Exit; // Exit the function
+      end;
+    end
+    else
+    begin
+      MsgBox('Installation canceled because the old version was not uninstalled.', mbError, MB_OK);
+      Result := False; // Abort installation
+      Exit; // Exit the function
+    end;
+  end;
+
+  Result := True; // Continue with installation
+end;
+
+function GetModuleHandle(lpModuleName: LongInt): LongInt;
+external 'GetModuleHandleA@kernel32.dll stdcall';
+function ExtractIcon(hInst: LongInt; lpszExeFileName: String; nIconIndex: LongInt): LongInt;
+external 'ExtractIconW@shell32.dll stdcall';
+function DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: LongInt; cxWidth, cyWidth: Integer; istepIfAniCur: LongInt; hbrFlickerFreeDraw, diFlags: LongInt): LongInt;
+external 'DrawIconEx@user32.dll stdcall';
+function DestroyIcon(hIcon: LongInt): LongInt;
+external 'DestroyIcon@user32.dll stdcall';
+
+
+
+[Code]
+
+
+var
+  DeleteConfig: Boolean;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+  begin
+    // Ask the user with a confirmation dialog to delete the configuration files
+    if MsgBox('Do you want to delete the program configuration files as well?', mbConfirmation, MB_YESNO) = IDYES then
+    begin
+      DeleteConfig := True;
+    end;
+  end;
+end;
+
+procedure DeinitializeUninstall();
+var
+  ConfigPath: String;
+begin
+  if DeleteConfig then
+  begin
+    ConfigPath := ExpandConstant('{sd}\rfu');
+    if DirExists(ConfigPath) then
+    begin
+      DelTree(ConfigPath, True, True, True);
+    end;
+  end;
+end;
+
+procedure InitializeWizard();
+begin
+  // Initialize the DeleteConfig flag
+  DeleteConfig := False;
+end;

@@ -16,82 +16,83 @@ jobs:
         id: set-version
         run: |
           $version = "${{ github.ref }}" -replace "refs/tags/v", ""
-          echo "CURRENT_VER=v$version" >>  $env:GITHUB_OUTPUT 
-          echo "CURRENT_VER_NUM=$version" >>  $env:GITHUB_OUTPUT
+          echo "CURRENT_VER=v$version" >> $env:GITHUB_OUTPUT
+          echo "CURRENT_VER_NUM=$version" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
 
-
-  download:
+  build-installer:
     needs: get-version
     runs-on: windows-latest
     strategy:
       matrix:
-        asset:
-          - { repo: 'czqu/rfu-desktop', file: 'rfu_desktop_windows_x64.zip', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/RemoteFingerUnlockModule', file: 'RemoteFingerUnlockModule_ARM64.zip', version: '' }
-          - { repo: 'czqu/RemoteFingerUnlockModule', file: 'RemoteFingerUnlockModule_Win32.zip', version: '' }
-          - { repo: 'czqu/RemoteFingerUnlockModule', file: 'RemoteFingerUnlockModule_x64.zip', version: '' }
-          - { repo: 'czqu/fadacontrol', file: 'core-service-x86.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/fadacontrol', file: 'core-service-x64.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/fadacontrol', file: 'core-service-arm64.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/fadacontrol', file: 'install-service-x64.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/fadacontrol', file: 'install-service-arm64.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
-          - { repo: 'czqu/fadacontrol', file: 'install-service-x86.exe', version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}' }
+        include:
+          - platform: x64
+            module_file: RemoteFingerUnlockModule_x64.zip
+          - platform: x86
+            module_file: RemoteFingerUnlockModule_Win32.zip
+          - platform: arm64
+            module_file: RemoteFingerUnlockModule_ARM64.zip
     steps:
-      - name: Download asset
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download rfu-desktop (x64 only)
+        if: matrix.platform == 'x64'
         uses: dsaltares/fetch-gh-release-asset@master
         with:
-          repo: ${{ matrix.asset.repo }}
-          file: ${{ matrix.asset.file }}
-          version: ${{ matrix.asset.version }}
+          repo: 'czqu/rfu-desktop'
+          file: 'rfu_desktop_windows_x64.zip'
+          version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}'
           token: ${{ secrets.GH_TOKEN }}
-      - name: Unzip files
+
+
+      - name: Download RemoteFingerUnlockModule
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/RemoteFingerUnlockModule'
+          file: ${{ matrix.module_file }}
+          version: ''
+          token: ${{ secrets.GH_TOKEN }}
+
+
+      - name: Download fadacontrol core-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          file: 'core-service-${{ matrix.platform }}.exe'
+          version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Download fadacontrol install-service
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'czqu/fadacontrol'
+          file: 'install-service-${{ matrix.platform }}.exe'
+          version: 'tags/${{ needs.get-version.outputs.CURRENT_VER }}'
+          token: ${{ secrets.GH_TOKEN }}
+
+
+      - name: Unzip all downloaded files
         run: |
           Get-ChildItem -Path . -Filter *.zip | ForEach-Object {
             $zipFileName = $_.BaseName
             $destinationPath = Join-Path -Path (Get-Location) -ChildPath $zipFileName
-            Expand-Archive -Path $_.FullName -DestinationPath $destinationPath }
+            Expand-Archive -Path $_.FullName -DestinationPath $destinationPath -Force
+          }
         shell: pwsh
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: downloaded-files
-          path: ./**/*
-          retention-days: 1
 
-
-  compile:
-    needs: [get-version, download]
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        platform: [ x64, x86, arm64 ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download files
-        uses: actions/download-artifact@v3
-        with:
-          name: downloaded-files
-          path: ./
       - name: Compile Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
-        env:
-          OUTPUT1: ${{needs.get-version.outputs.CURRENT_VER}}
-          OUTPUT2: ${{needs.get-version.outputs.CURRENT_VER_NUM}}
         with:
           path: setup_${{ matrix.platform }}.iss
           options: /O+ /DAppVersion=${{ needs.get-version.outputs.CURRENT_VER_NUM }} /DVersionInfoVersion=${{ needs.get-version.outputs.CURRENT_VER_NUM }}
+
       - name: Upload release
         uses: softprops/action-gh-release@v2
-        env:
-          OUTPUT1: ${{needs.get-version.outputs.CURRENT_VER}}
-          OUTPUT2: ${{needs.get-version.outputs.CURRENT_VER_NUM}}
         with:
           files: "Output/*.exe"
           prerelease: false
           tag_name: ${{ needs.get-version.outputs.CURRENT_VER }}
           token: ${{ secrets.GH_TOKEN }}
           body_path: release_note.md
-
